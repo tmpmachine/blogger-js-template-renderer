@@ -2,10 +2,15 @@
 
 // version: 3.5
 function appBuilder(options) {
+
+	if (!options?.template) {
+		throw 'template not set';
+	}
+
 	// # vars
 	let $ = document.querySelector.bind(document);
 	let devTemplate = null;
-	let templateUrl = options?.templateUrl ?? `/template.html`;
+	let templateUrl = options?.template;
 	let widgets = [];
 	let viewData = options?.viewData ?? {};
 	let templates = options?.templates ?? {};
@@ -204,10 +209,8 @@ function appBuilder(options) {
 		for (let el of parentNode.content.querySelectorAll('include')) {
 			let target = el.getAttribute('name');
 			let templateEl = docEl.content.querySelector(`template[data-includable="${target}"]`)
-			console.log(templateEl.content)
 			replaceIncludables(docEl, templateEl);
 			let clone = templateEl.content.cloneNode(true);
-
 
 			el.parentNode.insertBefore(clone, el);
 			el.remove();
