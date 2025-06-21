@@ -1,6 +1,6 @@
 // @ts-check
 
-// version: 3.6
+// version: 3.7
 function appBuilder(options) {
 
 	if (!options?.template) {
@@ -175,8 +175,18 @@ function appBuilder(options) {
 				}
 			}
 
-			// replace template file
-			replaceIncludables(docEl, docEl);
+			// replace includables
+			{
+				// assume includables are always first level template
+				// 1. replace includables inside template tags
+				let topLevel =  docEl;
+				for (let templateTag of docEl.content.querySelectorAll('template')) {
+					replaceIncludables(topLevel, templateTag);
+				}
+	
+				// 2. replace includables in top level
+				replaceIncludables(topLevel, topLevel);
+			}
 
 			let content = docEl.content;
 			devTemplate = content;
@@ -204,16 +214,17 @@ function appBuilder(options) {
 		this.isReady = true;
 	}
 
-	function replaceIncludables(docEl, parentNode) {
-		for (let el of parentNode.content.querySelectorAll('include')) {
-			let target = el.getAttribute('name');
-			let templateEl = docEl.content.querySelector(`template[data-includable="${target}"]`)
-			replaceIncludables(docEl, templateEl);
-			let clone = templateEl.content.cloneNode(true);
+	function replaceIncludables(topLevel, parentNode) {
+		for (let includeTag of parentNode.content.querySelectorAll('include')) {
+			let target = includeTag.getAttribute('name');
+			let templateTag = topLevel.content.querySelector(`template[data-includable="${target}"]`)
+			
+			// replace include tags inside templates
+			// replaceIncludables(docEl, templateTag);
 
-			el.parentNode.insertBefore(clone, el);
-			el.remove();
-			templateEl.remove();
+			includeTag.parentNode.insertBefore(templateTag.content.cloneNode(true), includeTag);
+			includeTag.remove();
+			templateTag.remove();
 		}
 	}
 
