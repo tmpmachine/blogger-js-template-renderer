@@ -1,6 +1,6 @@
 // @ts-check
 
-// version: 3.5
+// version: 3.6
 function appBuilder(options) {
 
 	if (!options?.template) {
@@ -12,12 +12,13 @@ function appBuilder(options) {
 	let devTemplate = null;
 	let templateUrl = options?.template;
 	let widgets = [];
-	let viewData = options?.viewData ?? {};
 	let templates = options?.templates ?? {};
 	let dataDoc = document;
 	let dataMap = [];
 	let countMap = 0;
 	let downloadableTemplate = null;
+	let _globalData = {};
+	let _isDevelopment = location.port ? true : false;
 
 	// # function
 
@@ -38,7 +39,6 @@ function appBuilder(options) {
 
 	function readBranchNode(branchNode, data) {
 		let key = branchNode.slot;
-		let type = branchNode.dataset.type;
 
 		if (key.endsWith('[]')) {
 			let items = [];
@@ -48,13 +48,6 @@ function appBuilder(options) {
 			}
 
 			data[key.replace('[]', '')] = items;
-		} else if (type == 'boolean') {
-			try {
-				dataMap[countMap++] = JSON.parse(branchNode.textContent);
-				data[key] = countMap - 1;
-			} catch (error) {
-				console.error(error);
-			}
 		} else {
 			dataMap[countMap++] = branchNode;
 			data[key] = countMap - 1;
@@ -101,7 +94,6 @@ function appBuilder(options) {
 			let itemEl = (templateNode.content ?? templateNode).cloneNode(true) ?? document.createDocumentFragment();
 
 			removeObsoletes(itemEl);
-			removeConditionalWidgets(itemEl, viewData);
 			removeConditionalWidgets(itemEl, item);
 
 			Object.entries(item).forEach(([key, value]) => {
@@ -111,8 +103,10 @@ function appBuilder(options) {
 						const templateName = el.dataset.template;
 
 						for (let v of value) {
+							let includableData = v;
 							const widgetBuilder = Object.create(widgetBase);
-							widgetBuilder.data = v;
+
+							widgetBuilder.data = Object.assign(includableData, _globalData);
 							widgetBuilder.templateSelector = `#${templateName}`;
 
 							const childNodes = widgetBuilder.build();
@@ -150,7 +144,7 @@ function appBuilder(options) {
 
 	// # build
 	async function build_() {
-		if (location.port) {
+		if (_isDevelopment) {
 			let r = await fetch(templateUrl).then((r) => r.text());
 			let docEl = document.createElement('template');
 			docEl.innerHTML = r;
@@ -202,6 +196,11 @@ function appBuilder(options) {
 			$('._app').replaceChildren(...devTemplate.childNodes);
 		}
 
+		// release from memory
+		if (!_isDevelopment) {
+			widgets.length = 0;
+		}
+
 		this.isReady = true;
 	}
 
@@ -231,14 +230,24 @@ function appBuilder(options) {
 		for (const node of nodes) {
 			let key = node.dataset.bIf;
 			let isInverse = false;
-			let dataTagValue;
 
 			if (key.startsWith('!')) {
 				isInverse = true;
 				key = key.slice(1);
 			}
 
-			const evalResult = data[key] ?? false;
+			let evalResult = false;
+			let dataKey = data[key];
+
+			if (dataKey && dataMap[dataKey]) {
+				let dataVal = dataMap[dataKey];
+				if (dataVal.dataset?.type == 'boolean') {
+					evalResult = JSON.parse(dataVal.textContent);
+				} else {
+					evalResult = dataVal?.textContent?.trim().length > 0;
+				}
+			}
+
 			let isCondMet = evalResult;
 
 			if (isInverse) {
@@ -263,10 +272,14 @@ function appBuilder(options) {
 		}
 	}
 
-	// # fill
+	// this is the initial process of replacing custom template tags
+	// tags: # fill
 	function fillWidgets() {
+		let globalData = widgets.find((e) => e.id == 'Global')?.data ?? {};
+		_globalData = globalData;
+
 		removeObsoletes(devTemplate);
-		removeConditionalWidgets(devTemplate, viewData);
+		removeConditionalWidgets(devTemplate, _globalData);
 		processSection();
 		processWidget();
 	}
@@ -299,7 +312,7 @@ function appBuilder(options) {
 				let widgetBuilder = Object.create(widgetBase);
 				let widgetData = widgets.find((e) => e.id == instanceId);
 
-				widgetBuilder.data = widgetData.data;
+				widgetBuilder.data = Object.assign(widgetData.data, _globalData);
 
 				widgetBuilder.templateSelector = `template#${templateId}`;
 
@@ -344,9 +357,8 @@ function appBuilder(options) {
 					widgetData.data.posts = widgetData.data.posts.slice(0, maxPostsLimit);
 				}
 			}
-
 			let widgetBuilder = Object.create(widgetBase);
-			widgetBuilder.data = widgetData.data;
+			widgetBuilder.data = Object.assign(widgetData.data, _globalData);
 
 			widgetBuilder.templateSelector = `template#${templateId}`;
 
@@ -388,7 +400,7 @@ function appBuilder(options) {
 			}
 
 			options.dataPath = options.dataPath + `/${location.pathname.split('/').pop()}`;
-			if (location.port) {
+			if (_isDevelopment) {
 				let html = await fetch(options.dataPath).then((response) => response.text());
 				const parser = new DOMParser();
 				const doc = parser.parseFromString(html, 'text/html');
@@ -397,7 +409,7 @@ function appBuilder(options) {
 
 			loadData();
 
-			if (location.port) {
+			if (_isDevelopment) {
 				console.log('widgets in this page:', widgets);
 			}
 
