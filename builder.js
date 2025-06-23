@@ -1,11 +1,7 @@
 // @ts-check
 
-// version: 3.7
+// version: 3.8
 function appBuilder(options) {
-
-	if (!options?.template) {
-		throw 'template not set';
-	}
 
 	// # vars
 	let $ = document.querySelector.bind(document);
@@ -19,6 +15,10 @@ function appBuilder(options) {
 	let downloadableTemplate = null;
 	let _globalData = {};
 	let _isDevelopment = location.port ? true : false;
+
+	if (_isDevelopment && !options?.template) {
+		throw 'template not set';
+	}
 
 	// # function
 
@@ -179,11 +179,11 @@ function appBuilder(options) {
 			{
 				// assume includables are always first level template
 				// 1. replace includables inside template tags
-				let topLevel =  docEl;
+				let topLevel = docEl;
 				for (let templateTag of docEl.content.querySelectorAll('template')) {
 					replaceIncludables(topLevel, templateTag);
 				}
-	
+
 				// 2. replace includables in top level
 				replaceIncludables(topLevel, topLevel);
 			}
@@ -200,7 +200,7 @@ function appBuilder(options) {
 
 			$('._appTemplate').remove();
 
-			devTemplate = content.querySelector('[data-title="Blog Template"]');
+			devTemplate = content.querySelector('.widget-content');
 
 			fillWidgets();
 			$('._app').replaceChildren(...devTemplate.childNodes);
@@ -218,7 +218,7 @@ function appBuilder(options) {
 		for (let includeTag of parentNode.content.querySelectorAll('include')) {
 			let target = includeTag.getAttribute('name');
 			let templateTag = topLevel.content.querySelector(`template[data-includable="${target}"]`)
-			
+
 			// replace include tags inside templates
 			// replaceIncludables(docEl, templateTag);
 
