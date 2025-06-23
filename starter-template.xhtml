@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<!-- v1 --><html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateUrl='indie.xml' b:templateVersion='1.3.3' expr:dir='data:blog.languageDirection' expr:lang='data:blog.locale' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+  <head>
+    <meta expr:content='data:blog.url' property='article:publisher'/>    
+
+    <b:if cond='data:view.isSingleItem'>
+      <meta content='article' property='og:type'/>
+      <b:else/>
+      <meta content='website' property='og:type'/>
+    </b:if>
+
+    <b:if cond='data:view.isSingleItem or data:view.isHomepage'>
+      
+      <title>
+        <b:eval expr='data:blog.pageName ? (data:blog.pageName + &quot; - &quot; + data:blog.title.escaped) : data:blog.title.escaped'/>
+      </title>
+      <meta expr:content='data:view.description' name='description'/>
+      <meta expr:content='data:blog.title' property='og:site_name'/>
+
+    <b:elseif cond='data:view.isSearch'/>
+       
+      <b:if cond='data:view.search.label'>
+        <b:include name='searchLabelPage.title-and-meta'/>
+        <b:elseif cond='data:view.search.query'/>
+        <title>
+          <b:eval expr='&quot;Search result : &quot; + data:view.search.query.escaped'/>
+        </title>
+        <b:else/>
+        <title>
+          <data:messages.olderPosts/>
+        </title>
+      </b:if>
+
+    <b:elseif cond='data:view.isArchive'/>
+
+      <title>
+        <data:messages.blogArchive/> :
+        <data:blog.pageName/>
+      </title>
+
+    <b:else/>
+
+      <title>404 : Page not found -
+        <data:blog.title/>
+      </title>
+      <meta expr:content='&quot;404 : Page not found - &quot; + data:blog.title' property='og:title'/>
+      <meta content='The page that you are looking had been moved, deleted, or never existed' property='og:description'/>
+      <meta content='The page that you are looking had been moved, deleted, or never existed' name='description'/>
+
+    </b:if>
+
+    <!-- # skin -->
+    <b:skin version='1.3.3'><![CDATA[
+/*
+<!-- Variable definitions -->
+<Group description="2nd Generator Blogger Template Comment Theme">
+   <Variable name="body.background" description="Body Background" type="background" color="#dddfe2" default="#dddfe2 none repeat scroll top left" value="#dddfe2 none repeat scroll top left"/>
+   <Variable name="body.font" description="Font" type="font" default="normal 400 14px Roboto, Arial, sans-serif" value="normal 400 14px Arial,sans-serif"/>
+   <Variable name="body.text.color" description="Text Color" type="color" default="#1d2129" value="#1d2129"/>
+   <Variable name="body.text.font" description="1" type="font" default="$(body.font)" value="normal 400 14px Roboto,Arial,sans-serif"/>
+   <Variable name="posts.background.color" description="2" type="color" default="#fff" value="#ffffff"/>
+   <Variable name="body.link.color" description="3" type="color" default="#008c5f" value="#008c5f"/>
+   <Variable name="body.link.visited.color" description="4" type="color" default="#008c5f" value="#008c5f"/>
+   <Variable name="body.link.hover.color" description="5" type="color" default="#1d2129" value="#1d2129"/>
+   <Variable name="blog.title.font" description="6" type="font" default="$(body.text.font)" value="normal 400 14px Roboto, Arial, sans-serif"/>
+   <Variable name="blog.title.color" description="7" type="color" default="#fff" value="#ffffff"/>
+   <Variable name="header.icons.color" description="8" type="color" default="#fff" value="#ffffff"/>
+   <Variable name="tabs.font" description="9" type="font" default="$(body.text.font)" value="normal 400 14px Arial,sans-serif"/>
+   <Variable name="tabs.color" description="10" type="color" default="#ccc" value="#cccccc"/>
+   <Variable name="tabs.selected.color" description="11" type="color" default="#fff" value="#ffffff"/>
+   <Variable name="tabs.overflow.background.color" description="12" type="color" default="#fff" value="#ffffff"/>
+   <Variable name="tabs.overflow.color" description="13" type="color" default="$(body.text.color)" value="#1d2129"/>
+   <Variable name="tabs.overflow.selected.color" description="14" type="color" default="$(body.text.color)" value="#1d2129"/>
+   <Variable name="posts.title.color" description="15" type="color" default="$(body.text.color)" value="#1d2129"/>
+   <Variable name="posts.title.font" description="16" type="font" default="$(body.text.font)" value="normal 400 14px Arial,sans-serif"/>
+   <Variable name="posts.text.font" description="17" type="font" default="$(body.text.font)" value="normal 400 14px Arial,sans-serif"/>
+   <Variable name="posts.text.color" description="18" type="color" default="$(body.text.color)" value="#1d2129"/>
+   <Variable name="posts.icons.color" description="19" type="color" default="$(body.text.color)" value="#6c6f74"/>
+   <Variable name="labels.background.color" description="20" type="color" default="#008c5f" value="#008c5f"/>
+</Group>
+*/
+]]></b:skin>
+    
+    <meta content='width=device-width' name='viewport'/>
+    <meta charset='UTF-8'/>
+
+    <b:if cond='data:view.isArchive'>
+      <meta content='noindex, noarchive' name='robots'/>
+    </b:if>
+    
+	<b:include data='blog' name='all-head-content'/>
+    
+  </head>
+  <body>
+    
+    <b:if cond='data:view.isLayoutMode'>
+    
+		<!-- # layout -->
+      
+      	<div style='display:flex;'>
+          <b:include name='section:blog_template'/>
+          <b:include name='section:blog_scripts'/>
+      	</div>
+      
+    <b:else/>
+      
+		<!-- # app -->
+      	<div class='_app'/>
+
+      	<template class='_appTemplate'>
+          <b:include name='section:blog_template'/>
+      	</template>
+      
+      	<div hidden='hidden'>
+          <b:include name='section:blog_scripts'/>
+      	</div>
+      
+    </b:if>
+      
+    <!-- # section markups -->
+    <b:defaultmarkups>
+      	<b:defaultmarkup type='Common'>
+          <b:includable id='section:blog_scripts'>
+            <b:section id='blog_scripts'/>
+          </b:includable>
+    	</b:defaultmarkup>
+    </b:defaultmarkups>
+    
+  </body>
+</html>
