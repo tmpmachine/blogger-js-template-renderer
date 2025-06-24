@@ -102,6 +102,9 @@
           <b:include name='section:blog_template'/>
           <b:include name='section:blog_scripts'/>
       	</div>
+      	<div style='display:flex;'>
+          <b:include name='section:moveable_widgets'/>
+      	</div>
       
     <b:else/>
       
@@ -112,9 +115,13 @@
           <b:include name='section:blog_template'/>
       	</template>
       
+      	<!-- section and widgets -->
+      	<div style='height:1px;position:absolute;bottom:0;right:0;width:1px;padding:1px;overflow:hidden'>
+          <b:include name='section:moveable_widgets'/>
+      	</div>
+      
       	<div hidden='hidden'>
           <b:include name='section:blog_scripts'/>
-      	</div>
       
     </b:if>
       
