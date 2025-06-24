@@ -1,0 +1,50 @@
+<!-- # blog -->
+      <b:defaultmarkup type='Blog'>
+        <b:includable id='main'>
+          
+          <template class='WidgetData' expr:id='data:widget.instanceId'>
+            <div>
+              <data slot='newerPageUrl'><data:newerPageUrl/></data>
+              <data slot='olderPageUrl'><data:olderPageUrl/></data>
+              <data slot='posts[]'>
+                <b:loop values='data:posts' var='post'>
+                  <div>
+                    <data slot='url'><data:post.url/></data>
+                    <data slot='title'>
+                      <b:if cond='data:view.isSingleItem'>
+                        <h1><data:post.title/></h1>
+                      <b:else/>
+                        <h2><a expr:href='data:post.url'><data:post.title/></a></h2>
+                      </b:if>
+                    </data>
+                    <data slot='date'><data:post.date/></data>
+                    <data slot='body'><data:post.body/></data>
+                    <data slot='appRpcRelayPath'><data:post.appRpcRelayPath/></data>
+                    <data slot='commentFormIframeSrc'><data:post.commentFormIframeSrc/></data>
+                    <data slot='cmtfpIframe'><data:post.cmtfpIframe/></data>
+                    <data slot='commentsUrl'><data:post.commentsUrl/></data>
+                    <data slot='commentsUrlOnclick'><data:post.commentsUrlOnclick/></data>
+                    <b:if cond='data:post.labels'>
+                        <data data-type='boolean' slot='hasLabels'>true</data>
+                    </b:if>
+
+                    <data slot='labels[]'>
+                      <b:loop values='data:post.labels' var='label'>
+                        <div>
+                          <data slot='url'><data:label.url/></data>
+                          <data slot='name'><data:label.name/></data>
+                        </div>
+                      </b:loop>
+                    </data>
+                  </div>
+                </b:loop>
+              </data>
+             </div>
+          </template>
+          <b:loop values='data:posts' var='post'>
+            <b:if cond='data:view.isSingleItem'>
+              <b:include data='post' name='postMetadataJSON'/>
+            </b:if>
+          </b:loop>
+        </b:includable>
+      </b:defaultmarkup>
