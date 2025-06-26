@@ -1,6 +1,6 @@
 // @ts-check
 
-// version: 3.8
+// version: 4.0
 function appBuilder(options) {
 
 	// # vars
@@ -152,16 +152,15 @@ function appBuilder(options) {
 			// replace template file
 			{
 				for (let el of docEl.content.querySelectorAll('file')) {
-					let target = el.dataset.targetFile;
-					let url = templates[target];
+					let src = el.getAttribute('src');
 
-					if (!url) {
+					if (!src) {
 						el.remove();
 						continue;
 					}
 
 					await new Promise((resolve) => {
-						fetch(url)
+						fetch(src)
 							.then((r) => r.text())
 							.then((r) => {
 								let docEl = document.createElement('div');
@@ -210,8 +209,6 @@ function appBuilder(options) {
 		if (!_isDevelopment) {
 			widgets.length = 0;
 		}
-
-		this.isReady = true;
 	}
 
 	function replaceIncludables(topLevel, parentNode) {
@@ -425,6 +422,9 @@ function appBuilder(options) {
 			}
 
 			await build_();
+
+			// for use in application script
+			window['isAppReady'] = true;
 		},
 	};
 }
